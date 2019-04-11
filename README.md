@@ -1,1 +1,3 @@
 # kavanaugh-njcounty-white-support
+
+This is a representation of counties in NJ's 3rd and 7th district mapped by the percentage of white respondents to the 2018 NYT Upshot midterm election poll and the percentage who supported Brett Kavanaugh's nomination to the Supreme Court. As shown here, there is a relatively positive relationship between white racial homogenity and percentage who support Kavanaugh, with Somerset and Essex/Union slightly outside of the near-linear relationship. Ocean County had the most concentrated white polling population, and also had the highest percentage of Kavanaugh support at over 47 percent. 
