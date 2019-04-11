@@ -1,0 +1,56 @@
+---
+title: "Kavanaugh-njcounty-white-support"
+author: "Henry Zhu"
+date: "April 10, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggrepel)
+library(scales)
+```
+
+```{r include=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+nj7 <- read_csv(
+  file = "https://raw.githubusercontent.com/TheUpshot/2018-live-poll-results/master/data/elections-poll-nj07-1.csv")
+
+nj3 <- read_csv(
+  file = "https://raw.githubusercontent.com/TheUpshot/2018-live-poll-results/master/data/elections-poll-nj03-1.csv")
+
+countycombined1<-bind_rows(nj7,nj3) %>%
+  mutate(region=fct_collapse(region, 
+                             Burlington= c("Burlington, Trump", "Burlington, Clinton")))
+
+countyrace <- countycombined1 %>%
+  filter(race_eth != "[DO NOT READ] Don't know/Refused") %>%
+  group_by(region, race_eth) %>%
+  select(region, race_eth) %>%
+  summarize(N = n()) %>%
+  mutate(freq = N / sum(N), pct = round((freq*100), 0)) %>%
+  filter(race_eth == "White") %>%
+  transmute(whitepct = pct)
+
+countykav <- countycombined1 %>%
+  select(region, APPKAV) %>%
+  group_by(region, APPKAV) %>%
+  summarize(N = n()) %>%
+  mutate(freq = N / sum(N), pct = round((freq*100), 0)) %>%
+  filter( APPKAV== "support") %>%
+  transmute( kavpct= pct)
+
+countycombined <- left_join(countyrace, countykav, by = "region")
+
+countycombined %>% ggplot(aes(x = whitepct, y = kavpct, label=region)) + geom_point() + geom_text_repel() +
+scale_y_continuous(labels=percent) +
+  labs(title="How does county racial homogeneity affect Kavanaugh's support?", subtitle="NJ's 3rd and 7th Congressional District, 2018", caption = "New York Times Upshot/Siena College from October 2018") +
+  xlab("Percentage of White Respondents Polled in County") +
+  ylab("Percentage Who Support Kavanaugh's Nomination")+
+  scale_x_continuous(breaks = seq(70, 100, by = 10),
+                     labels = c("70%", "80%","90%","100%"),
+                     limits= c(70,95)) +
+  scale_y_continuous(breaks = seq(35, 50, by = 5),
+                     labels = c("35%", "40%", "45%", "50%"), limits= c(35,48)) 
+```
+  
